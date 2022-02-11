@@ -6,12 +6,6 @@ import { Database } from '../commons/Database';
 
 const logger = new Logger('ExpoSQLiteDatabase');
 
-//SQLite.enablePromise(true);
-
-/* if (Logger.LOG_LEVEL === 'DEBUG') {
-	SQLite.DEBUG(true);
-}
- */
 const DB_NAME = 'AmplifyDatastore';
 const DB_DISPLAYNAME = 'AWS Amplify DataStore SQLite Database';
 
@@ -22,13 +16,7 @@ const DB_VERSION = '1.0';
 /*
 
 Note: 
-I purposely avoided using arrow functions () => {} in this class,
-Because I ran into issues with them in some of the SQLite method callbacks
-
-Also, even though the SQLite library is promisified, certain operations
-only work correctly with callbacks. Specifically, any time you need to
-get the result of an `executeSql` command inside of a transaction
-(see the batchQuery method below)
+I purposely used arrow functions () => {} in this class as expo-sqlite library is not promisified
 
 */
 
@@ -36,7 +24,7 @@ class ExpoSQLiteDatabase implements Database {
 	private db: SQLite.WebSQLDatabase;
 
 	public async init(): Promise<void> {
-		//only openDatabase once.
+		// only open database once.
 		if (!this.db) {
 			this.db = SQLite.openDatabase(
 				DB_NAME,
@@ -52,12 +40,11 @@ class ExpoSQLiteDatabase implements Database {
 	}
 
 	public async clear(): Promise<void> {
-		logger.debug('Deleting database');
-		//delete database is not supported by expo-sqlite. alternative way is to get all table names and drop them.
-		//await SQLite.deleteDatabase(DB_NAME);
+		logger.debug('Clearing database');
+		// delete database is not supported by expo-sqlite. alternative way is to get all table names and drop them.
 		this.dropAllTables();
-		logger.debug('Database deleted');
-		//await this.closeDB();
+		logger.debug('Database cleared');
+		// closing db is not required as we are not deleting the db.
 	}
 
 	public async get<T extends PersistentModel>(
@@ -205,7 +192,7 @@ class ExpoSQLiteDatabase implements Database {
 
 		results = await new Promise((resolve, reject) => {
 			this.db.transaction(function (tx) {
-				var tempresults;
+				let tempresults;
 				tx.executeSql(
 					queryStatement,
 					queryParams,
@@ -254,8 +241,9 @@ class ExpoSQLiteDatabase implements Database {
 	private async closeDB() {
 		if (this.db) {
 			logger.debug('Closing Database');
-			//closing database is not supported by expo-sqlite. Workaround is to access the private db variable and call the close() method.
-			var tempdb: any = this.db;
+			// closing database is not supported by expo-sqlite.
+			// Workaround is to access the private db variable and call the close() method.
+			const tempdb: any = this.db;
 			await tempdb._db.close();
 			logger.debug('Database closed');
 		}
