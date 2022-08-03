@@ -2,12 +2,10 @@ import { ConsoleLogger as Logger } from '@aws-amplify/core';
 import { PersistentModel } from '@aws-amplify/datastore';
 import { deleteAsync, documentDirectory } from 'expo-file-system';
 import { openDatabase, WebSQLDatabase } from 'expo-sqlite';
-
+import { DB_NAME } from '../common/constants';
 import { CommonSQLiteDatabase, ParameterizedStatement } from '../common/types';
 
 const logger = new Logger('ExpoSQLiteDatabase');
-
-const DB_NAME = 'AmplifyDatastore';
 
 /*
 
@@ -128,6 +126,7 @@ class ExpoSQLiteDatabase implements CommonSQLiteDatabase {
 					resolveTransaction(results);
 				} catch (error) {
 					rejectTransaction(error);
+					logger.warn(error);
 				}
 			});
 		});
@@ -138,13 +137,13 @@ class ExpoSQLiteDatabase implements CommonSQLiteDatabase {
 		deleteParameterizedStatements?: Set<ParameterizedStatement>
 	): Promise<void> {
 		return new Promise((resolveTransaction, rejectTransaction) => {
-			try {
-				this.db.transaction(async transaction => {
+			this.db.transaction(async transaction => {
+				try {
 					// await for all sql statements promises to resolve
 					await Promise.all(
 						[...saveParameterizedStatements].map(
 							([statement, params]) =>
-								new Promise((resolve, reject) =>
+								new Promise((resolve, reject) => {
 									transaction.executeSql(
 										statement,
 										params,
@@ -156,8 +155,8 @@ class ExpoSQLiteDatabase implements CommonSQLiteDatabase {
 											logger.warn(error);
 											return true;
 										}
-									)
-								)
+									);
+								})
 						)
 					);
 					if (deleteParameterizedStatements) {
@@ -182,10 +181,11 @@ class ExpoSQLiteDatabase implements CommonSQLiteDatabase {
 						);
 					}
 					resolveTransaction(null);
-				});
-			} catch (error) {
-				rejectTransaction(error);
-			}
+				} catch (error) {
+					rejectTransaction(error);
+					logger.warn(error);
+				}
+			});
 		});
 	}
 
@@ -230,6 +230,7 @@ class ExpoSQLiteDatabase implements CommonSQLiteDatabase {
 					resolveTransaction(result);
 				} catch (error) {
 					rejectTransaction(error);
+					logger.warn(error);
 				}
 			});
 		});
@@ -260,6 +261,7 @@ class ExpoSQLiteDatabase implements CommonSQLiteDatabase {
 					resolveTransaction(null);
 				} catch (error) {
 					rejectTransaction(error);
+					logger.warn(error);
 				}
 			});
 		});
