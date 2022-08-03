@@ -1,6 +1,6 @@
 {
 	"defaultSeverity": "error",
-	"plugins": ["prettier"],
+	"plugins": ["prettier", "jest"],
 	"extends": [],
 	"jsRules": {},
 	"rules": {
@@ -44,7 +44,8 @@
 			"always",
 			"ignore-interfaces",
 			"ignore-bound-class-methods"
-		]
+		],
+		"jest/no-identical-title": "error"
 	},
 	"rulesDirectory": []
 }

@@ -13,14 +13,23 @@ jest.mock('expo-file-system', () => ({
 const mockDatabase = {
 	readTransaction: jest.fn(),
 	transaction: jest.fn(),
-	_db: { close: () => {} },
+	_db: { close: jest.fn(() => {}) },
 };
 const mockTransaction = { executeSql: jest.fn() };
 
-const MOCK_SQL_ERROR = {
+mockDatabase.readTransaction.mockImplementation(func => {
+	func(mockTransaction);
+});
+mockDatabase.transaction.mockImplementation(func => {
+	func(mockTransaction);
+});
+
+const MOCK_SQL_ERROR = new Error('Sample_Error');
+
+/* {
 	code: 400,
 	message: 'Error performing the transaction',
-};
+}; */
 
 const DEFAULT_STATEMENT = 'SELECT * FROM ABCD';
 const DEFAULT_STATEMENT_PARAMS = [];
@@ -47,12 +56,6 @@ const MOCK_RESULT_SET_EMPTY = {
 
 describe('ExpoSQLiteDatabase', () => {
 	const instance = new ExpoSQLiteDatabase();
-	mockDatabase.readTransaction.mockImplementation(func => {
-		func(mockTransaction);
-	});
-	mockDatabase.transaction.mockImplementation(func => {
-		func(mockTransaction);
-	});
 
 	afterEach(() => {
 		jest.clearAllMocks();
@@ -103,7 +106,7 @@ describe('ExpoSQLiteDatabase', () => {
 	});
 
 	describe('get', () => {
-		it('should resolve promise and return whole first element when transaction is successful', async () => {
+		it('should resolve promise and return first element when transaction is successful', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					successCallback(mockTransaction, MOCK_RESULT_SET_NUMBER);
@@ -203,7 +206,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).rejects.toStrictEqual(MOCK_SQL_ERROR);
 		});
 
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when the any SQL execution is unsuccessful', async () => {
 			mockTransaction.executeSql
 				.mockImplementationOnce(
 					(statement, params, successCallback, errorCallback) => {
@@ -245,7 +248,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).resolves.toBeNull();
 		});
 
-		it('should resolve to null when successful and provided multiple save and delete statements.', async () => {
+		it('should resolve to null when successful and provided multiple save and delete statements', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					successCallback(mockTransaction, MOCK_RESULT_SET_STRING);
@@ -260,8 +263,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).resolves.toBeNull();
 		});
 
-		// multiple delete and no save statements
-		it('should resolve to null when successful and provided multiple delete and no save statements.', async () => {
+		it('should resolve to null when successful and provided multiple delete statements only', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					successCallback(mockTransaction, MOCK_RESULT_SET_STRING);
@@ -273,8 +275,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).resolves.toBeNull();
 		});
 
-		// no statements at all
-		it('should resolve to null when successful and provided no statements at all.', async () => {
+		it('should resolve to null when successful and provided no statements at all', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					successCallback(mockTransaction, MOCK_RESULT_SET_STRING);
@@ -284,7 +285,7 @@ describe('ExpoSQLiteDatabase', () => {
 			await expect(instance.batchSave()).resolves.toBeNull();
 		});
 
-		it('should resolve to null when successful and provided multiple saveStatements.', async () => {
+		it('should resolve to null when successful and provided multiple saveStatements', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					errorCallback(mockTransaction, MOCK_SQL_ERROR);
@@ -296,19 +297,20 @@ describe('ExpoSQLiteDatabase', () => {
 			).rejects.toMatchObject(MOCK_SQL_ERROR);
 		});
 
-		it('should resolve to null when successful and provided multiple save and delete statements.', async () => {
+		it('should resolve to null when successful and provided multiple save and delete statements', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					errorCallback(mockTransaction, MOCK_SQL_ERROR);
 				}
 			);
-
+			/* 			expect.assertions(1);
+			 */
 			await expect(
 				instance.batchSave(
 					saveParameterizedStatements,
 					deleteParameterizedStatements
 				)
-			).rejects.toMatchObject(MOCK_SQL_ERROR);
+			).rejects.toEqual(MOCK_SQL_ERROR);
 		});
 
 		it('should reject promise and return error when the transaction is unsuccessful', async () => {
