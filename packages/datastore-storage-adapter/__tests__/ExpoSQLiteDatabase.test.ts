@@ -532,6 +532,7 @@ describe('ExpoSQLiteDatabase', () => {
 			await instance.init();
 			await instance.clear();
 			expect((instance as any).db).toBeUndefined();
+			expect(mockDatabase._db.close).toBeCalled();
 		});
 	});
 });
