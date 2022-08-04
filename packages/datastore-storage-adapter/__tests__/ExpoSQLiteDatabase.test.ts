@@ -92,7 +92,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).resolves.toStrictEqual([]);
 		});
 
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when error occurs while running the sql query', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					errorCallback(mockTransaction, MOCK_SQL_ERROR);
@@ -129,7 +129,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).resolves.toStrictEqual(undefined);
 		});
 
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when executing get query fails', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					errorCallback(mockTransaction, MOCK_SQL_ERROR);
@@ -154,7 +154,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).resolves.toBeNull();
 		});
 
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when the write transaction fails', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					errorCallback(mockTransaction, MOCK_SQL_ERROR);
@@ -194,7 +194,7 @@ describe('ExpoSQLiteDatabase', () => {
 			]);
 		});
 
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when the batchQuery transaction fails', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					errorCallback(mockTransaction, MOCK_SQL_ERROR);
@@ -313,7 +313,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).rejects.toEqual(MOCK_SQL_ERROR);
 		});
 
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when batchSave fails', async () => {
 			mockTransaction.executeSql
 				.mockImplementationOnce(
 					(statement, params, successCallback, errorCallback) => {
@@ -335,7 +335,7 @@ describe('ExpoSQLiteDatabase', () => {
 		});
 
 		// test sqlerror in when running deleteStatements
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when deleteStatements fail inside batchSave', async () => {
 			mockTransaction.executeSql
 				.mockImplementationOnce(
 					(statement, params, successCallback, errorCallback) => {
@@ -362,7 +362,7 @@ describe('ExpoSQLiteDatabase', () => {
 		});
 
 		// test sqlerror in when running saveStatements
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when saveStatements fails inside batchSave', async () => {
 			mockTransaction.executeSql
 				.mockImplementationOnce(
 					(statement, params, successCallback, errorCallback) => {
@@ -414,7 +414,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).resolves.toStrictEqual(MOCK_RESULT_ARRAY_STRING);
 		});
 
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when the selectAndDelete transaction fails', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					errorCallback(mockTransaction, MOCK_SQL_ERROR);
@@ -430,7 +430,7 @@ describe('ExpoSQLiteDatabase', () => {
 		});
 
 		// test sqlerror in when running saveStatements
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when saveStatements fails inside selectAndDelete', async () => {
 			mockTransaction.executeSql
 				.mockImplementationOnce(
 					(statement, params, successCallback, errorCallback) => {
@@ -476,7 +476,7 @@ describe('ExpoSQLiteDatabase', () => {
 			).resolves.toBeNull();
 		});
 
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when executeStatements fails', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					errorCallback(mockTransaction, MOCK_SQL_ERROR);
@@ -506,7 +506,7 @@ describe('ExpoSQLiteDatabase', () => {
 			await expect(instance.createSchema(statements)).resolves.toBeNull();
 		});
 
-		it('should reject promise and return error when the transaction is unsuccessful', async () => {
+		it('should reject promise and return error when createSchema transaction is unsuccessful', async () => {
 			mockTransaction.executeSql.mockImplementation(
 				(statement, params, successCallback, errorCallback) => {
 					errorCallback(mockTransaction, MOCK_SQL_ERROR);
