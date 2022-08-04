@@ -45,7 +45,6 @@
 	},
 	"jest": {
 		"globals": {
-			"preset": "react-native",
 			"ts-jest": {
 				"diagnostics": true,
 				"tsConfig": {
