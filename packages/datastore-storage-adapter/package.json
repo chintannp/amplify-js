@@ -40,10 +40,12 @@
 		"expo-file-system": "13.1.4",
 		"expo-sqlite": "10.1.0",
 		"react-native-sqlite-storage": "5.0.0",
+		"eslint-plugin-jest" :"^26.5.3",
 		"sqlite3": "^5.0.2"
 	},
 	"jest": {
 		"globals": {
+			"preset": "react-native",
 			"ts-jest": {
 				"diagnostics": true,
 				"tsConfig": {
